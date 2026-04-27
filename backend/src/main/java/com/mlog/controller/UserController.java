@@ -2,6 +2,7 @@ package com.mlog.controller;
 
 import com.mlog.dto.LoginRequest;
 import com.mlog.dto.Result;
+import com.mlog.dto.SendCodeRequest;
 import com.mlog.entity.User;
 import com.mlog.service.IUserService;
 import com.mlog.utils.UserHolder;
@@ -17,9 +18,9 @@ public class UserController {
 
     private final IUserService userService;
 
-    @PostMapping("code")
-    public Result sendCode(@RequestParam("phone") String phone) {
-        return userService.sendCode(phone);
+    @PostMapping("/code")
+    public Result sendCode(@RequestBody SendCodeRequest request) {
+        return userService.sendCode(request.getPhone());
     }
 
     @PostMapping("login")

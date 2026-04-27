@@ -1,24 +1,87 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginApi, sendCodeApi } from "../api/auth";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+
   const [phone, setPhone] = useState("");
+  const [code, setCode] = useState("");
   const [agreed, setAgreed] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [sendingCode, setSendingCode] = useState(false);
 
-  const canLogin = phone.trim() !== "" && agreed;
+  const canSendCode = phone.trim() !== "";
+  const canLogin = phone.trim() !== "" && code.trim() !== "" && agreed && !loading;
 
-  const handleLogin = () => {
-    if (!canLogin) return;
+  const handleSendCode = async () => {
+    if (!canSendCode) {
+      alert("휴대폰 번호를 입력하세요.");
+      return;
+    }
 
-    // 나중에 여기서 실제 로그인 API 연결
-    navigate("/me");
+    try {
+      setSendingCode(true);
+
+      const res = await sendCodeApi({
+        phone: phone.trim(),
+      });
+
+      if (!res.data.success) {
+        alert(res.data.errorMsg || "인증번호 요청 실패");
+        return;
+      }
+
+      alert("인증번호가 생성되었습니다. 백엔드 콘솔 로그를 확인하세요.");
+    } catch (error) {
+      console.error(error);
+      alert("인증번호 요청 중 오류가 발생했습니다.");
+    } finally {
+      setSendingCode(false);
+    }
+  };
+
+  const handleLogin = async () => {
+    if (!agreed) {
+      alert("약관에 동의해야 로그인할 수 있습니다.");
+      return;
+    }
+
+    if (!phone.trim() || !code.trim()) {
+      alert("휴대폰 번호와 인증번호를 입력하세요.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await loginApi({
+        phone: phone.trim(),
+        code: code.trim(),
+      });
+
+      if (!res.data.success) {
+        alert(res.data.errorMsg || "로그인 실패");
+        return;
+      }
+
+      const { token, userId, nickname } = res.data.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", String(userId));
+      localStorage.setItem("nickname", nickname);
+
+      navigate("/me");
+    } catch (error) {
+      console.error(error);
+      alert("로그인 요청 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="screen">
-
-
       <div className="top-row">
         <button className="icon-btn" onClick={() => navigate("/welcome")}>
           ←
@@ -44,19 +107,37 @@ export default function LoginPage() {
           />
         </div>
 
+        <div className="phone-input-wrap code-input-wrap">
+          <input
+            className="phone-input"
+            placeholder="Enter verification code"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+          <button
+            className="send-code-btn"
+            onClick={handleSendCode}
+            disabled={!canSendCode || sendingCode}
+          >
+            {sendingCode ? "Sending..." : "Send Code"}
+          </button>
+        </div>
+
         <button className="switch-login-btn">⇄ Log in with password</button>
 
         <button
           className={`primary-btn ${canLogin ? "" : "disabled"}`}
           onClick={handleLogin}
+          disabled={!canLogin}
         >
-          Log in
+          {loading ? "Logging in..." : "Log in"}
         </button>
 
         <div className="agree-row">
           <button
             className={`check-circle ${agreed ? "checked" : ""}`}
             onClick={() => setAgreed(!agreed)}
+            type="button"
           >
             {agreed ? "✓" : ""}
           </button>

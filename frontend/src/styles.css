@@ -44,14 +44,6 @@ body {
   background: linear-gradient(180deg, #0b0b11 0%, #101019 100%);
 }
 
-.status-bar {
-  display: flex;
-  justify-content: space-between;
-  padding: 18px 22px 8px;
-  font-size: 16px;
-  font-weight: 600;
-}
-
 .top-row {
   display: flex;
   justify-content: space-between;
@@ -572,4 +564,25 @@ body {
   .screen {
     max-width: 100%;
   }
+}
+
+.code-input-wrap {
+  margin-top: 18px;
+}
+
+.send-code-btn {
+  border: none;
+  background: rgba(255, 138, 0, 0.14);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.send-code-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }

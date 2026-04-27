@@ -1,8 +1,69 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getMeApi } from "../api/auth";
+
+interface UserInfo {
+  id: number;
+  phone: string;
+  nickname: string;
+  avatar?: string;
+  createdAt?: string;
+  updateAt?: string;
+}
+
 export default function ProfilePage() {
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState<UserInfo | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const res = await getMeApi();
+
+        if (!res.data.success) {
+          alert(res.data.errorMsg || "로그인이 필요합니다.");
+          localStorage.removeItem("token");
+          localStorage.removeItem("userId");
+          localStorage.removeItem("nickname");
+          navigate("/");
+          return;
+        }
+
+        setUser(res.data.data);
+      } catch (error) {
+        console.error(error);
+        alert("로그인 정보를 불러오지 못했습니다.");
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("nickname");
+        navigate("/");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMe();
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("nickname");
+    navigate("/");
+  };
+
+  if (loading) {
+    return (
+      <div className="screen">
+        <div className="profile-loading">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="screen">
-
-      
       <div className="profile-page">
         <div className="profile-hero">
           <div className="profile-top-icons">
@@ -15,13 +76,16 @@ export default function ProfilePage() {
 
           <div className="profile-head">
             <div className="avatar-wrap">
-              <div className="avatar">m</div>
+              <div className="avatar">
+                {user?.nickname ? user.nickname.charAt(0).toLowerCase() : "m"}
+              </div>
               <div className="avatar-plus">+</div>
             </div>
 
             <div className="profile-main-info">
-              <h2 className="profile-name">mlog_USER_01</h2>
-              <p className="profile-id">mlog ID: 5161635241</p>
+              <h2 className="profile-name">{user?.nickname || "mlog user"}</h2>
+              <p className="profile-id">mlog ID: {user?.id}</p>
+              <p className="profile-id">Phone: {user?.phone}</p>
             </div>
           </div>
 
@@ -44,7 +108,9 @@ export default function ProfilePage() {
 
           <div className="action-row">
             <button className="outline-small-btn">Edit profile</button>
-            <button className="outline-small-btn">⚙</button>
+            <button className="outline-small-btn" onClick={handleLogout}>
+              Logout
+            </button>
           </div>
 
           <div className="feature-cards">

@@ -28,8 +28,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             String path = request.getRequestURI();
 
-            // Exclude login-related APIs
-            if (path.contains("/login") || path.contains("/sendCode")) {
+            // 로그인 관련 API는 JWT 검증 없이 통과
+            if (path.equals("/user/login") || path.equals("/user/code") || path.equals("/error")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            // CORS preflight 요청 통과
+            if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
                 filterChain.doFilter(request, response);
                 return;
             }
