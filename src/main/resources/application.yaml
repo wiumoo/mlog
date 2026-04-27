@@ -1,8 +1,0 @@
-spring:
-  application:
-    name: mlog
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost/hmdp?useSSL=false&serverTimezone=UTC
-    username: root
-    password: Parkminwoo0402+
