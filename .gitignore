@@ -4,8 +4,9 @@
 *.iml
 
 
-# build
+# Java / Spring Boot
 target/
+*.class
 
 # logs
 *.log
@@ -13,3 +14,14 @@ target/
 # OS
 .DS_Store
 Thumbs.db
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Env
+.env
+*.env
