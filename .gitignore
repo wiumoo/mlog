@@ -3,6 +3,9 @@
 .ai/
 *.iml
 
+# IDE
+.idea/
+.vscode/
 
 # Java / Spring Boot
 target/
@@ -25,3 +28,6 @@ frontend/dist/
 # Env
 .env
 *.env
+
+# Optional (캐시)
+frontend/.vite/
