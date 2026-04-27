@@ -101,7 +101,6 @@ public class UserServiceImpl implements IUserService {
         return Result.ok(response);
     }
 
-
     private User createUser(String phone) {
         User user = new User();
 
@@ -117,6 +116,10 @@ public class UserServiceImpl implements IUserService {
         return user;
     }
 
+    @Override
+    public User getById(Long id) {
+        return userMapper.selectById(id);
+    }
 }
 
 

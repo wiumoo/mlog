@@ -31,3 +31,6 @@ logging:
 jwt:
   secret: mlog-jwt-secret-key-for-login-token
   expire: 86400000
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
