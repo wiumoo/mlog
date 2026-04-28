@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMeApi } from "../api/auth";
+import BottomNav from "../components/BottomNav";
 
 interface UserInfo {
   id: number;
@@ -17,41 +18,61 @@ export default function ProfilePage() {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const isLoggedIn = user !== null;
+
   useEffect(() => {
     const fetchMe = async () => {
+      const token = localStorage.getItem("token");
+
+      // No token means guest mode
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
       try {
         const res = await getMeApi();
 
         if (!res.data.success) {
-          alert(res.data.errorMsg || "로그인이 필요합니다.");
+          // Token exists but is invalid or expired
           localStorage.removeItem("token");
           localStorage.removeItem("userId");
           localStorage.removeItem("nickname");
-          navigate("/");
+
+          setUser(null);
           return;
         }
 
         setUser(res.data.data);
       } catch (error) {
         console.error(error);
-        alert("로그인 정보를 불러오지 못했습니다.");
+
+        // API failed or token invalid: stay on profile page as guest
         localStorage.removeItem("token");
         localStorage.removeItem("userId");
         localStorage.removeItem("nickname");
-        navigate("/");
+
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
 
     fetchMe();
-  }, [navigate]);
+  }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("nickname");
-    navigate("/");
+  const handleAuthButton = () => {
+    if (isLoggedIn) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("nickname");
+
+      setUser(null);
+      return;
+    }
+
+    navigate("/login");
   };
 
   if (loading) {
@@ -61,6 +82,13 @@ export default function ProfilePage() {
       </div>
     );
   }
+
+  const displayName = isLoggedIn ? user.nickname : "Guest";
+  const displayId = isLoggedIn ? user.id : "-";
+  const displayPhone = isLoggedIn ? user.phone : "Not logged in";
+  const avatarText = isLoggedIn
+    ? user.nickname.charAt(0).toLowerCase()
+    : "g";
 
   return (
     <div className="screen">
@@ -76,20 +104,22 @@ export default function ProfilePage() {
 
           <div className="profile-head">
             <div className="avatar-wrap">
-              <div className="avatar">
-                {user?.nickname ? user.nickname.charAt(0).toLowerCase() : "m"}
-              </div>
+              <div className="avatar">{avatarText}</div>
               <div className="avatar-plus">+</div>
             </div>
 
             <div className="profile-main-info">
-              <h2 className="profile-name">{user?.nickname || "mlog user"}</h2>
-              <p className="profile-id">mlog ID: {user?.id}</p>
-              <p className="profile-id">Phone: {user?.phone}</p>
+              <h2 className="profile-name">{displayName}</h2>
+              <p className="profile-id">mlog ID: {displayId}</p>
+              <p className="profile-id">Phone: {displayPhone}</p>
             </div>
           </div>
 
-          <p className="bio-text">Tap here to fill in your bio</p>
+          <p className="bio-text">
+            {isLoggedIn
+              ? "Tap here to fill in your bio"
+              : "Log in to create your food profile"}
+          </p>
 
           <div className="stats-row">
             <div className="stat-item">
@@ -107,9 +137,12 @@ export default function ProfilePage() {
           </div>
 
           <div className="action-row">
-            <button className="outline-small-btn">Edit profile</button>
-            <button className="outline-small-btn" onClick={handleLogout}>
-              Logout
+            <button className="outline-small-btn">
+              {isLoggedIn ? "Edit profile" : "Guest mode"}
+            </button>
+
+            <button className="outline-small-btn" onClick={handleAuthButton}>
+              {isLoggedIn ? "Logout" : "Login"}
             </button>
           </div>
 
@@ -138,30 +171,25 @@ export default function ProfilePage() {
 
         <div className="empty-post-area">
           <div className="empty-icon">🖼</div>
-          <p className="empty-title">Clear food photos in your album</p>
-          <button className="outline-post-btn">Post</button>
-        </div>
-
-        <div className="bottom-nav">
-          <div className="nav-item active">
-            <span>⌂</span>
-            <span>Home</span>
-          </div>
-          <div className="nav-item">
-            <span>▣</span>
-            <span>Market</span>
-          </div>
-          <div className="nav-center">+</div>
-          <div className="nav-item">
-            <span>◌</span>
-            <span>Messages</span>
-          </div>
-          <div className="nav-item">
-            <span>●</span>
-            <span>Me</span>
-          </div>
+          <p className="empty-title">
+            {isLoggedIn
+              ? "Clear food photos in your album"
+              : "Log in and share your food moments"}
+          </p>
+          <button
+            className="outline-post-btn"
+            onClick={() => {
+              if (!isLoggedIn) {
+                navigate("/login");
+              }
+            }}
+          >
+            {isLoggedIn ? "Post" : "Login"}
+          </button>
         </div>
       </div>
+
+      <BottomNav />
     </div>
   );
 }

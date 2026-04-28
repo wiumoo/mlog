@@ -586,3 +586,271 @@ body {
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+/* ================================
+   Home Feed Page
+================================ */
+
+.app-page {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  background: #06060b;
+  color: var(--text);
+  padding-bottom: 92px;
+}
+
+.top-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: 62px;
+  padding: 14px 16px 8px;
+  background: rgba(6, 6, 11, 0.96);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.icon-button {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.top-tabs {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.top-tabs .active {
+  color: white;
+  font-size: 18px;
+}
+
+.category-tabs {
+  position: sticky;
+  top: 62px;
+  z-index: 9;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 8px 14px 12px;
+  background: rgba(6, 6, 11, 0.96);
+  border-bottom: 1px solid var(--line);
+}
+
+.category-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.category-tabs button {
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: var(--card);
+  color: var(--muted-2);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.category-tabs button.active {
+  background: var(--accent);
+  color: white;
+}
+
+.masonry-grid {
+  column-count: 2;
+  column-gap: 12px;
+  padding: 14px 12px;
+}
+
+.post-card {
+  break-inside: avoid;
+  margin-bottom: 12px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+
+.post-card img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.post-content {
+  padding: 10px;
+}
+
+.post-content h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ================================
+   Shop List Page
+================================ */
+
+.page-title-header {
+  padding: 28px 18px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.page-title-header h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.page-title-header p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.shop-list {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.shop-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+
+.shop-card img {
+  width: 104px;
+  height: 104px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: var(--card-soft);
+}
+
+.shop-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.shop-info h3 {
+  margin: 2px 0 8px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.shop-info p {
+  margin: 4px 0;
+  color: var(--muted-2);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.shop-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--accent-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.empty-state {
+  padding: 80px 20px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* ================================
+   Bottom Nav Button Reset
+================================ */
+
+.bottom-nav {
+  z-index: 30;
+}
+
+.nav-item {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav-center {
+  border: none;
+  cursor: pointer;
+}
+
+.shop-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.shop-title-row h3 {
+  margin: 2px 0 8px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.shop-rank {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 138, 0, 0.14);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* ================================
+   Fixed solid top/bottom bars
+================================ */
+
+.top-header {
+  background: #06060b !important;
+  backdrop-filter: none !important;
+}
+
+.category-tabs {
+  background: #06060b !important;
+  backdrop-filter: none !important;
+}
+
+.bottom-nav {
+  background: #06060b !important;
+  backdrop-filter: none !important;
+  box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.45);
+}
+
+.app-page {
+  padding-bottom: 110px !important;
+}

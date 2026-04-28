@@ -71,7 +71,7 @@ export default function LoginPage() {
       localStorage.setItem("userId", String(userId));
       localStorage.setItem("nickname", nickname);
 
-      navigate("/me");
+      navigate("/home");
     } catch (error) {
       console.error(error);
       alert("로그인 요청 중 오류가 발생했습니다.");
@@ -83,7 +83,7 @@ export default function LoginPage() {
   return (
     <div className="screen">
       <div className="top-row">
-        <button className="icon-btn" onClick={() => navigate("/welcome")}>
+        <button className="icon-btn" onClick={() => navigate("/me")}>
           ←
         </button>
         <button className="text-btn">Help</button>
