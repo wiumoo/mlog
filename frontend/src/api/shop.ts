@@ -19,3 +19,7 @@ export interface Shop {
 export const getShopList = () => {
   return request.get("/shop/list");
 };
+
+export const getShopDetail = (id: number | string) => {
+  return request.get(`/shop/${id}`);
+};

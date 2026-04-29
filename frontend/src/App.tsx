@@ -5,6 +5,7 @@ import ProfilePage from "./pages/ProfilePage";
 import HomePage from "./pages/HomePage";
 import ShopListPage from "./pages/ShopListPage";
 import "./styles.css";
+import ShopDetailPage from "./pages/ShopDetailPage";
 
 function App() {
   return (
@@ -14,8 +15,9 @@ function App() {
       <Route path="/shops" element={<ShopListPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/welcome" element={<WelcomePage />} />
-      <Route path="/me" element={<ProfilePage />} />
+      <Route path="/me" element={<ProfilePage />} />  
       <Route path="*" element={<Navigate to="/" replace />} />
+    <Route path="/shops/:id" element={<ShopDetailPage />} />
     </Routes>
   );
 }

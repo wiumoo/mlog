@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getShopList } from "../api/shop";
 import type { Shop } from "../api/shop";
 import BottomNav from "../components/BottomNav";
@@ -10,6 +11,7 @@ export default function ShopListPage() {
   const [shops, setShops] = useState<Shop[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadShopList();
@@ -81,7 +83,18 @@ export default function ShopListPage() {
       ) : (
         <main className="shop-list">
           {filteredShops.map((shop) => (
-            <article key={shop.id} className="shop-card">
+            <article
+                key={shop.id}
+                className="shop-card"
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(`/shops/${shop.id}`)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    navigate(`/shops/${shop.id}`);
+                  }
+                }}
+              >
               <img
                 src={
                   shop.imageUrl && !shop.imageUrl.includes("example.com")
