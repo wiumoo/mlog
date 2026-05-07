@@ -13,4 +13,6 @@ public interface IBlogService {
 
     Result getHotFeed();
 
+    Result getFollowFeed();
+
 }

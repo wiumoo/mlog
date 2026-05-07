@@ -9,13 +9,15 @@ import com.mlog.utils.UserHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import static com.mlog.utils.RedisConstants.BLOG_LIKED_KEY;
-import static com.mlog.utils.RedisConstants.BLOG_LIKED_RANK_KEY;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.mlog.utils.RedisConstants.BLOG_LIKED_KEY;
 import static com.mlog.utils.RedisConstants.BLOG_LIKED_RANK_KEY;
+import static com.mlog.utils.RedisConstants.FOLLOW_USER_KEY;
 
 @Service
 @RequiredArgsConstructor
@@ -127,5 +129,36 @@ public class BlogServiceImpl implements IBlogService {
 
         return Result.ok(blogs);
     }
+
+    @Override
+    public Result getFollowFeed() {
+
+        Long userId = UserHolder.getUser();
+
+        if (userId == null) {
+            return Result.fail("로그인이 필요합니다.");
+        }
+
+        String key = FOLLOW_USER_KEY + userId;
+
+        Set<String> followUserIdSet = stringRedisTemplate.opsForSet().members(key);
+
+        if (followUserIdSet == null || followUserIdSet.isEmpty()) {
+            return Result.ok(List.of());
+        }
+
+        String ids = followUserIdSet.stream()
+                .filter(id -> id != null && id.matches("\\d+"))
+                .collect(Collectors.joining(","));
+
+        if (ids.isEmpty()) {
+            return Result.ok(List.of());
+        }
+
+        List<Blog> blogs = blogMapper.selectFollowFeed(ids);
+
+        return Result.ok(blogs);
+    }
+
 
 }

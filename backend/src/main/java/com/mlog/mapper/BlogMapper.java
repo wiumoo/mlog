@@ -89,4 +89,26 @@ public interface BlogMapper {
           AND status = 1
         """)
     Blog selectById(Long id);
+
+    @Select("""
+    SELECT
+        id,
+        user_id AS userId,
+        shop_id AS shopId,
+        title,
+        content,
+        image_url AS imageUrl,
+        liked_count AS likedCount,
+        comments_count AS commentsCount,
+        status,
+        created_at AS createdAt,
+        updated_at AS updatedAt
+    FROM blog
+    WHERE status = 1
+      AND user_id IN (${ids})
+    ORDER BY created_at DESC
+    LIMIT 20
+    """)
+    List<Blog> selectFollowFeed(@Param("ids") String ids);
+
 }

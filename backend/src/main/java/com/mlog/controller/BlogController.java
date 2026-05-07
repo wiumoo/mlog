@@ -32,4 +32,10 @@ public class BlogController {
     public Result getHotFeed() {
         return blogService.getHotFeed();
     }
+
+    @GetMapping("/feed/follow")
+    public Result getFollowFeed() {
+        return blogService.getFollowFeed();
+    }
+
 }
