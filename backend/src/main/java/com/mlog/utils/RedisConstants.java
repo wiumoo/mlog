@@ -13,4 +13,7 @@ public class RedisConstants {
 
     public static final Long CACHE_NULL_TTL = 2L;
 
+    public static final String BLOG_LIKED_KEY = "blog:liked:";
+    public static final String BLOG_LIKED_RANK_KEY = "blog:liked:rank";
+
 }

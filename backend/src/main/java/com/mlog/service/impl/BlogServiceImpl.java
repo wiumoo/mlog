@@ -7,13 +7,20 @@ import com.mlog.mapper.BlogMapper;
 import com.mlog.service.IBlogService;
 import com.mlog.utils.UserHolder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import static com.mlog.utils.RedisConstants.BLOG_LIKED_KEY;
+import static com.mlog.utils.RedisConstants.BLOG_LIKED_RANK_KEY;
+
 
 @Service
 @RequiredArgsConstructor
 public class BlogServiceImpl implements IBlogService {
 
     private final BlogMapper blogMapper;
+
+    private final StringRedisTemplate stringRedisTemplate;
 
     @Override
     public Result createBlog(BlogCreateRequest request) {
@@ -48,4 +55,45 @@ public class BlogServiceImpl implements IBlogService {
     public Result getFeed() {
         return Result.ok(blogMapper.selectFeed());
     }
+
+    @Override
+    public Result likeBlog(Long blogId) {
+
+        Long userId = UserHolder.getUser();
+
+        if (userId == null) {
+            return Result.fail("로그인이 필요합니다.");
+        }
+
+        String key = BLOG_LIKED_KEY + blogId;
+        String userIdStr = userId.toString();
+        String blogIdStr = blogId.toString();
+
+        Double score = stringRedisTemplate.opsForZSet().score(key, userIdStr);
+
+        if (score == null) {
+            // 좋아요 추가
+            stringRedisTemplate.opsForZSet()
+                    .add(key, userIdStr, System.currentTimeMillis());
+
+            stringRedisTemplate.opsForZSet()
+                    .incrementScore(BLOG_LIKED_RANK_KEY, blogIdStr, 1);
+
+            blogMapper.incrementLikedCount(blogId);
+
+            return Result.ok("liked");
+        } else {
+            // 좋아요 취소
+            stringRedisTemplate.opsForZSet()
+                    .remove(key, userIdStr);
+
+            stringRedisTemplate.opsForZSet()
+                    .incrementScore(BLOG_LIKED_RANK_KEY, blogIdStr, -1);
+
+            blogMapper.decrementLikedCount(blogId);
+
+            return Result.ok("unliked");
+        }
+    }
+
 }

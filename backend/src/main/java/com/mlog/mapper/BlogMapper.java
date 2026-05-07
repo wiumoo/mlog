@@ -1,10 +1,7 @@
 package com.mlog.mapper;
 
 import com.mlog.entity.Blog;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -58,4 +55,19 @@ public interface BlogMapper {
             ORDER BY created_at DESC
             """)
     List<Blog> selectFeed();
+
+    @Update("""
+        UPDATE blog
+        SET liked_count = liked_count + 1
+        WHERE id = #{id}
+        """)
+    void incrementLikedCount(Long id);
+
+    @Update("""
+        UPDATE blog
+        SET liked_count = liked_count - 1
+        WHERE id = #{id}
+          AND liked_count > 0
+        """)
+    void decrementLikedCount(Long id);
 }

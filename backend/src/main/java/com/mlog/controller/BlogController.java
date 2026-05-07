@@ -22,4 +22,9 @@ public class BlogController {
     public Result getFeed() {
         return blogService.getFeed();
     }
+
+    @PostMapping("/{id}/like")
+    public Result likeBlog(@PathVariable("id") Long id) {
+        return blogService.likeBlog(id);
+    }
 }

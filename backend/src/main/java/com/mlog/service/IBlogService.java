@@ -8,4 +8,6 @@ public interface IBlogService {
     Result createBlog(BlogCreateRequest request);
 
     Result getFeed();
+
+    Result likeBlog(Long blogId);
 }
