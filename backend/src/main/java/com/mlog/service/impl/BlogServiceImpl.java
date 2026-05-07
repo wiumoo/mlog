@@ -12,7 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import static com.mlog.utils.RedisConstants.BLOG_LIKED_KEY;
 import static com.mlog.utils.RedisConstants.BLOG_LIKED_RANK_KEY;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import static com.mlog.utils.RedisConstants.BLOG_LIKED_RANK_KEY;
 
 @Service
 @RequiredArgsConstructor
@@ -87,13 +90,42 @@ public class BlogServiceImpl implements IBlogService {
             stringRedisTemplate.opsForZSet()
                     .remove(key, userIdStr);
 
-            stringRedisTemplate.opsForZSet()
+            Double newScore = stringRedisTemplate.opsForZSet()
                     .incrementScore(BLOG_LIKED_RANK_KEY, blogIdStr, -1);
+
+            if (newScore == null || newScore <= 0) {
+                stringRedisTemplate.opsForZSet()
+                        .remove(BLOG_LIKED_RANK_KEY, blogIdStr);
+            }
 
             blogMapper.decrementLikedCount(blogId);
 
             return Result.ok("unliked");
         }
+    }
+
+    @Override
+    public Result getHotFeed() {
+
+        Set<String> blogIdSet = stringRedisTemplate.opsForZSet()
+                .reverseRange(BLOG_LIKED_RANK_KEY, 0, 9);
+
+        if (blogIdSet == null || blogIdSet.isEmpty()) {
+            return Result.ok(blogMapper.selectFeed());
+        }
+
+        List<Blog> blogs = new ArrayList<>();
+
+        for (String blogIdStr : blogIdSet) {
+            Long blogId = Long.valueOf(blogIdStr);
+            Blog blog = blogMapper.selectById(blogId);
+
+            if (blog != null) {
+                blogs.add(blog);
+            }
+        }
+
+        return Result.ok(blogs);
     }
 
 }

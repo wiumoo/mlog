@@ -27,4 +27,9 @@ public class BlogController {
     public Result likeBlog(@PathVariable("id") Long id) {
         return blogService.likeBlog(id);
     }
+
+    @GetMapping("/feed/hot")
+    public Result getHotFeed() {
+        return blogService.getHotFeed();
+    }
 }

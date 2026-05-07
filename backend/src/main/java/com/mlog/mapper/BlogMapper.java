@@ -70,4 +70,23 @@ public interface BlogMapper {
           AND liked_count > 0
         """)
     void decrementLikedCount(Long id);
+
+    @Select("""
+        SELECT
+            id,
+            user_id AS userId,
+            shop_id AS shopId,
+            title,
+            content,
+            image_url AS imageUrl,
+            liked_count AS likedCount,
+            comments_count AS commentsCount,
+            status,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM blog
+        WHERE id = #{id}
+          AND status = 1
+        """)
+    Blog selectById(Long id);
 }

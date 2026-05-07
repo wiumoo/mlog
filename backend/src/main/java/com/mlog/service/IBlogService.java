@@ -10,4 +10,7 @@ public interface IBlogService {
     Result getFeed();
 
     Result likeBlog(Long blogId);
+
+    Result getHotFeed();
+
 }
