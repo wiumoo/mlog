@@ -33,4 +33,10 @@ public class Shop {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private Double latitude;
+
+    private Double longitude;
+
+    private Double distance;
 }

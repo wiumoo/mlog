@@ -1,6 +1,5 @@
 package com.mlog.service.impl;
 
-import ch.qos.logback.core.encoder.JsonEscapeUtil;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,11 +10,13 @@ import com.mlog.mapper.ShopMapper;
 import com.mlog.service.IShopService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.geo.*;
+import org.springframework.data.geo.Point;
+import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.mlog.utils.RedisConstants.*;
@@ -35,9 +36,16 @@ public class ShopServiceImpl implements IShopService {
 
     @Override
     public Result list() {
-        // Query shop list from MySQL first.
-        // Redis cache will be added after the basic API works.
         List<Shop> shops = shopMapper.findAll();
+
+        for (Shop shop : shops) {
+            log.info("shop id={}, name={}, lat={}, lng={}",
+                    shop.getId(),
+                    shop.getName(),
+                    shop.getLatitude(),
+                    shop.getLongitude());
+        }
+
         return Result.ok(shops);
     }
 
@@ -165,4 +173,86 @@ public class ShopServiceImpl implements IShopService {
             log.info("[SHOP_DETAIL_LOCK_RELEASED] key={}", lockKey);
         }
     }
+
+    @Override
+    public Result loadShopGeoData() {
+        List<Shop> shops = shopMapper.selectAllWithLocation();
+
+        if (shops == null || shops.isEmpty()) {
+            return Result.ok("No shop location data to load");
+        }
+
+        log.info("Loaded shops from DB for GEO: {}", shops.size());
+
+        for (Shop shop : shops) {
+            stringRedisTemplate.opsForGeo().add(
+                    SHOP_GEO_KEY,
+                    new Point(shop.getLongitude(), shop.getLatitude()),
+                    shop.getId().toString()
+            );
+        }
+
+        return Result.ok("Loaded shop geo data: " + shops.size());
+    }
+
+    @Override
+    public Result queryNearbyShops(Double lat, Double lng, Double radius) {
+        if (lat == null || lng == null) {
+            return Result.fail("lat and lng are required");
+        }
+
+        if (radius == null || radius <= 0) {
+            radius = 3.0;
+        }
+
+        Circle circle = new Circle(
+                new Point(lng, lat),
+                new Distance(radius, Metrics.KILOMETERS)
+        );
+
+        GeoResults<RedisGeoCommands.GeoLocation<String>> results =
+                stringRedisTemplate.opsForGeo().radius(
+                        SHOP_GEO_KEY,
+                        circle,
+                        RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs()
+                                .includeDistance()
+                                .sortAscending()
+                                .limit(20)
+                );
+
+        if (results == null || results.getContent().isEmpty()) {
+            return Result.ok(new ArrayList<>());
+        }
+
+        List<Long> ids = new ArrayList<>();
+        Map<Long, Double> distanceMap = new HashMap<>();
+
+        for (GeoResult<RedisGeoCommands.GeoLocation<String>> result : results) {
+            String shopIdStr = result.getContent().getName();
+            Long shopId = Long.valueOf(shopIdStr);
+
+            ids.add(shopId);
+            distanceMap.put(shopId, result.getDistance().getValue());
+        }
+
+        List<Shop> shops = shopMapper.selectByIds(ids);
+
+        Map<Long, Shop> shopMap = new HashMap<>();
+        for (Shop shop : shops) {
+            shopMap.put(shop.getId(), shop);
+        }
+
+        List<Shop> sortedShops = new ArrayList<>();
+
+        for (Long id : ids) {
+            Shop shop = shopMap.get(id);
+            if (shop != null) {
+                shop.setDistance(distanceMap.get(id));
+                sortedShops.add(shop);
+            }
+        }
+
+        return Result.ok(sortedShops);
+    }
+
 }

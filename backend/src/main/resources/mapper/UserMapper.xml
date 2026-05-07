@@ -5,10 +5,8 @@
 
 <mapper namespace="com.mlog.mapper.UserMapper">
 
-    <!-- Find user by id -->
     <select id="selectById" resultType="com.mlog.entity.User">
-        SELECT
-        id,
+        SELECT id,
         phone,
         nickname,
         avatar,

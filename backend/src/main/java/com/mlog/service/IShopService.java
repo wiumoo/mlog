@@ -8,4 +8,9 @@ public interface IShopService {
 
     // Get shop detail by shop id
     Result detail(Long id);
+
+    Result loadShopGeoData();
+
+    Result queryNearbyShops(Double lat, Double lng, Double radius);
+
 }
