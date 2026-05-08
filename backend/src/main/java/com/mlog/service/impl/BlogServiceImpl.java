@@ -4,20 +4,22 @@ import com.mlog.dto.BlogCreateRequest;
 import com.mlog.dto.Result;
 import com.mlog.entity.Blog;
 import com.mlog.mapper.BlogMapper;
+import com.mlog.scheduler.BlogVisitStatsScheduler;
 import com.mlog.service.IBlogService;
 import com.mlog.utils.UserHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.mlog.utils.RedisConstants.BLOG_LIKED_KEY;
-import static com.mlog.utils.RedisConstants.BLOG_LIKED_RANK_KEY;
-import static com.mlog.utils.RedisConstants.FOLLOW_USER_KEY;
+import static com.mlog.utils.RedisConstants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,8 @@ public class BlogServiceImpl implements IBlogService {
     private final BlogMapper blogMapper;
 
     private final StringRedisTemplate stringRedisTemplate;
+
+    private final BlogVisitStatsScheduler blogVisitStatsScheduler;
 
     @Override
     public Result createBlog(BlogCreateRequest request) {
@@ -160,5 +164,40 @@ public class BlogServiceImpl implements IBlogService {
         return Result.ok(blogs);
     }
 
+    @Override
+    public Result recordVisit(Long blogId) {
+        Long userId = UserHolder.getUser();
+
+        if (userId == null) {
+            return Result.fail("로그인이 필요합니다.");
+        }
+
+        String date = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+        String key = BLOG_VISIT_KEY + blogId + ":" + date;
+
+        stringRedisTemplate.opsForHyperLogLog()
+                .add(key, userId.toString());
+
+        stringRedisTemplate.expire(key, 3, TimeUnit.DAYS);
+
+        return Result.ok();
+    }
+
+    @Override
+    public Result getVisitCount(Long blogId) {
+        String date = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+        String key = BLOG_VISIT_KEY + blogId + ":" + date;
+
+        Long count = stringRedisTemplate.opsForHyperLogLog()
+                .size(key);
+
+        return Result.ok(count);
+    }
+
+    @Override
+    public Result saveTodayVisitStats() {
+        blogVisitStatsScheduler.saveBlogVisitStatsByDate(LocalDate.now());
+        return Result.ok();
+    }
 
 }

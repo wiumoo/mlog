@@ -15,4 +15,10 @@ public interface IBlogService {
 
     Result getFollowFeed();
 
+    Result recordVisit(Long blogId);
+
+    Result getVisitCount(Long blogId);
+
+    Result saveTodayVisitStats();
+
 }

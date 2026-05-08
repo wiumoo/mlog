@@ -20,4 +20,6 @@ public class RedisConstants {
 
     public static final String SHOP_GEO_KEY = "shop:geo";
 
+    public static final String BLOG_VISIT_KEY = "blog:visit:";
+
 }

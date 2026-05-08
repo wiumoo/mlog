@@ -38,4 +38,19 @@ public class BlogController {
         return blogService.getFollowFeed();
     }
 
+    @PostMapping("/{id}/visit")
+    public Result recordVisit(@PathVariable("id") Long id) {
+        return blogService.recordVisit(id);
+    }
+
+    @GetMapping("/{id}/visit/count")
+    public Result getVisitCount(@PathVariable("id") Long id) {
+        return blogService.getVisitCount(id);
+    }
+
+    @PostMapping("/visit/stats/save")
+    public Result saveVisitStats() {
+        return blogService.saveTodayVisitStats();
+    }
+
 }
