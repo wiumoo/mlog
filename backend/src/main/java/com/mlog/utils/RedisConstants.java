@@ -22,4 +22,11 @@ public class RedisConstants {
 
     public static final String BLOG_VISIT_KEY = "blog:visit:";
 
+    public static final String COUPON_STOCK_KEY = "coupon:stock:";
+    public static final String COUPON_USER_KEY = "coupon:user:";
+    public static final String COUPON_EVENT_KEY = "coupon:event:";
+
+
+
+
 }
