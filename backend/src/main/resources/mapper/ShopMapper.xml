@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mlog.mapper.ShopMapper">
+
+    <resultMap id="ShopResultMap" type="com.mlog.entity.Shop">
+        <id column="id" property="id"/>
+
+        <result column="name" property="name"/>
+        <result column="category" property="category"/>
+        <result column="address" property="address"/>
+        <result column="region" property="region"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="rating" property="rating"/>
+        <result column="review_count" property="reviewCount"/>
+        <result column="avg_price" property="avgPrice"/>
+        <result column="description" property="description"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="latitude" property="latitude"/>
+        <result column="longitude" property="longitude"/>
+    </resultMap>
+
+    <sql id="ShopColumns">
+        id,
+        name,
+        category,
+        address,
+        region,
+        image_url,
+        rating,
+        review_count,
+        avg_price,
+        description,
+        status,
+        created_at,
+        updated_at,
+        latitude,
+        longitude
+    </sql>
+
+    <select id="findAll" resultMap="ShopResultMap">
+        SELECT
+        <include refid="ShopColumns"/>
+        FROM shop
+        WHERE status = 1
+        ORDER BY id DESC
+    </select>
+
+    <select id="findById" resultMap="ShopResultMap">
+        SELECT
+        <include refid="ShopColumns"/>
+        FROM shop
+        WHERE id = #{id}
+        AND status = 1
+    </select>
+
+    <select id="selectAllWithLocation" resultMap="ShopResultMap">
+        SELECT
+        <include refid="ShopColumns"/>
+        FROM shop
+        WHERE status = 1
+        AND latitude IS NOT NULL
+        AND longitude IS NOT NULL
+    </select>
+
+    <select id="selectByIds" resultMap="ShopResultMap">
+        SELECT
+        <include refid="ShopColumns"/>
+        FROM shop
+        WHERE status = 1
+        AND id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

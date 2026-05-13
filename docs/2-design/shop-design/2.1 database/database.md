@@ -1,0 +1,15 @@
+CREATE TABLE shop (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    region VARCHAR(50),
+    image_url VARCHAR(255),
+    rating DECIMAL(2,1) DEFAULT 0.0,
+    review_count INT DEFAULT 0,
+    avg_price INT,
+    description VARCHAR(255),
+    status TINYINT DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
